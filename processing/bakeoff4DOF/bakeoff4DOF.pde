@@ -12,6 +12,7 @@ int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false;
 boolean flag = false;
+boolean flag2 = false;
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
@@ -64,7 +65,11 @@ void setup() {
 
 
 void draw() {
-
+  Target t = targets.get(trialIndex);  
+  boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
+  boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
+  println(closeZ);
   background(60); //background is dark grey
   fill(200);
   noStroke();
@@ -82,7 +87,6 @@ void draw() {
   //===========DRAW TARGET SQUARE=================
   pushMatrix();
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
-  Target t = targets.get(trialIndex);
   translate(t.x, t.y); //center the drawing coordinates to the center of the screen
   rotate(radians(t.rotation));
   fill(255, 0, 0); //set color to semi translucent
@@ -92,11 +96,12 @@ void draw() {
   //===========DRAW CURSOR SQUARE=================
   pushMatrix();
   if(flag2 == false){
-  translate(width/2, height/2);
+    translate(width/2, height/2);
+    
   }
-
-  
-  if(mousePressed && dist(width/2, height/2, mouseX, mouseY)<inchesToPixels(3f) && flag == false){
+    
+  println(screenTransX);
+  if(flag == false && mousePressed && dist(screenTransX, screenTransY, mouseX, mouseY)<inchesToPixels(1f)){
     flag = true;
     flag2= true;
   }
@@ -107,12 +112,6 @@ void draw() {
   }
   
   flag = false;
-  
-  
-  
-  //else{
-  //translate(width/2, height/2);
-  //}
  
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
@@ -127,9 +126,6 @@ void draw() {
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchesToPixels(.5f));
   
-  boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
-  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
-  boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
   if(closeRotation){
     fill(0, 255, 0);
    }
@@ -157,6 +153,22 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
+
+  ellipse(56, 46, 55, 55);
+  if(mousePressed && dist(56, 46, mouseX, mouseY)<inchesToPixels(2f)){
+    line(56, 46, mouseX, mouseY);
+    screenZ = dist(56, 46, mouseX, mouseY);
+      
+    PVector v1 = new PVector(56, 46);
+    PVector v2 = new PVector(mouseX, mouseY); 
+    float a = PVector.angleBetween(v1, v2);
+    text(getAngle(56, 46, mouseX, mouseY), 300,300);
+    screenRotation = getAngle(56, 46, mouseX, mouseY);
+  }
+
+  
+  
+  
   
   ////upper left corner, rotate counterclockwise
   //text("CCW", inchesToPixels(.2f), inchesToPixels(.2f));
@@ -250,3 +262,12 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
       else
         return diff;
  }
+ 
+// void mouseWheel(MouseEvent event) {
+//  float e = event.getCount();
+//  println(e);
+//}
+
+float getAngle(float pX1,float pY1, float pX2,float pY2){
+  return atan2(pY2 - pY1, pX2 - pX1)* 180/ PI;
+}
