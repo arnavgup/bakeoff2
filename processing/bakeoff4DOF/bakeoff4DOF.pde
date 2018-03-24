@@ -13,6 +13,8 @@ int finishTime = 0; //records the time of the final click
 boolean userDone = false;
 boolean flag = false;
 boolean flag2 = false;
+int lastX = 300;
+int lastY = 300;
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
@@ -66,10 +68,8 @@ void setup() {
 
 void draw() {
   Target t = targets.get(trialIndex);  
-  boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
-  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
-  boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
-  println(closeZ);
+
+
   background(60); //background is dark grey
   fill(200);
   noStroke();
@@ -97,21 +97,43 @@ void draw() {
   pushMatrix();
   if(flag2 == false){
     translate(width/2, height/2);
+    screenTransX = 0;
+    screenTransY = 0;
     
   }
+  
     
   println(screenTransX);
-  if(flag == false && mousePressed && dist(screenTransX, screenTransY, mouseX, mouseY)<inchesToPixels(1f)){
+  println(screenTransY);
+  if(flag == false && mousePressed && dist(lastX, lastY, mouseX, mouseY)<inchesToPixels(1f)){
     flag = true;
     flag2= true;
   }
   
   if(flag){
-    screenTransY = mouseY;
-    screenTransX = mouseX;
+    if(mouseY >= height/2){screenTransY = -1 * (height/2 - mouseY);}
+    else{screenTransY = mouseY - height/2;}
+    
+    if(mouseX >= width/2){screenTransX = mouseX - width/2;}
+    else{screenTransX = -1 * (width/2 - mouseX);}
   }
   
-  flag = false;
+  if (flag == true && mousePressed){
+    lastX = mouseX;
+    lastY = mouseY;
+    
+    //if(mouseY >= height/2){lastY = -1 * (height/2 - mouseY);}
+    //else{lastY = mouseY - height/2;}
+    
+    //if(mouseX >= width/2){lastX = mouseX - width/2;}
+    //else{lastX = -1 * (width/2 - mouseX);}
+    
+    screenTransY = lastY;
+    screenTransX = lastX;
+    flag = false;
+  }
+  
+  
  
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
@@ -120,6 +142,12 @@ void draw() {
   stroke(160);
   rect(0,0, screenZ, screenZ);
   popMatrix();
+  
+  boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
+  boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
+  println(t.x,t.y,lastX,lastY);
+  println(screenTransX, screenTransY);
   
     //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
@@ -133,13 +161,19 @@ void draw() {
      fill(220,20,60);
    }
   text("Rotation: " + closeRotation, 400, 110);
-    if(closeDist){
+   
+   
+   if(closeDist){
+     println("here");
     fill(0, 255, 0);
+    
    }
    else{
      fill(220,20,60);
    }
   text("Distance: " + closeDist, 400, 100);
+  
+  
   if(closeZ){
     fill(0, 255, 0);
    }
