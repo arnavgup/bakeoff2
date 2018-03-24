@@ -11,8 +11,10 @@ float errorPenalty = 0.5f; //for every error, add this to mean time
 int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false;
-boolean flag = false;
-boolean flag2 = false;
+boolean drag_phase = false;
+boolean start_game = false;
+boolean flag3 = true;
+boolean flag4 = false;
 int lastX = 300;
 int lastY = 300;
 final int screenPPI = 72; //what is the DPI of the screen you are using
@@ -96,34 +98,36 @@ void draw() {
 
   //===========DRAW CURSOR SQUARE=================
   pushMatrix();
-  if(flag2 == false){
+  if(start_game == false){
     translate(width/2, height/2);
     screenTransX = 0;
     screenTransY = 0;
     
   }
   
-  if(flag == false && mousePressed && dist(lastX, lastY, mouseX, mouseY)<inchesToPixels(0.5f)){
-    flag = true;
-    flag2= true;
+  if(flag3 && drag_phase == false && mousePressed && dist(lastX, lastY, mouseX, mouseY)<inchesToPixels(0.5f)){
+    drag_phase = true;
+    start_game= true;
+    println("asdasdhiahfsfmiosd");
   }
   
-  if(flag){
+  if(flag3 && drag_phase){
     screenTransY = mouseY;
     screenTransX = mouseX;
   }
   
-  if (flag == true && mousePressed){
+  if (flag3 && drag_phase == true && mousePressed){
     lastY = mouseY;
     lastX = mouseX;
     screenTransY = lastY;
     screenTransX = lastX;
-    flag = false;
+    println("drag done");
+    drag_phase = false;
   }
 
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
-  noFill();
+  fill(255,255,255,50);
   strokeWeight(3f);
   stroke(160);
   rect(0,0, screenZ, screenZ);
@@ -177,22 +181,17 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
+    if(flag3 == false){
+    float rotX = screenTransX;
+    float rotY = screenTransY;
   
-  float rotX = 100;
-  float rotY = 100;
-  ellipse(rotX, rotY, 50, 50);
-
-  if(mousePressed && dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
-    line(rotX, rotY, mouseX, mouseY);
-    screenZ = dist(rotX, rotY, mouseX, mouseY);
-      
-    //PVector v1 = new PVector(56, 46);
-    //PVector v2 = new PVector(mouseX, mouseY); 
-    //float a = PVector.angleBetween(v1, v2);
-    screenRotation = getAngle(rotX, rotY, mouseX, mouseY);
+    if(dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
+      line(rotX, rotY, mouseX, mouseY);
+      screenZ = dist(rotX, rotY, mouseX, mouseY);
+        
+      screenRotation = getAngle(rotX, rotY, mouseX, mouseY);
+    }
   }
-  fill(0,255,0);
-  ellipse(550, 550, 55, 55);
 
   
   
@@ -244,12 +243,7 @@ void mousePressed()
       startTime = millis();
       println("time started!");
     }
-}
-
-void mouseReleased()
-{
-  //check to see if user clicked middle of screen within 3 inches
-  if (dist(550,550, mouseX, mouseY)<inchesToPixels(1f))
+   if (flag3 == false)
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
@@ -262,6 +256,15 @@ void mouseReleased()
       userDone = true;
       finishTime = millis();
     }
+    flag3 = true;
+    drag_phase = false;
+  }
+}
+
+void mouseReleased()
+{
+  if(drag_phase==false){
+    flag3 = false;
   }
 }
 
