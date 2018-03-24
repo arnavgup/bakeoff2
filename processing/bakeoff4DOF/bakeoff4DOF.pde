@@ -3,7 +3,7 @@ import java.util.Collections;
 
 //these are variables you should probably leave alone
 int index = 0;
-int trialCount = 8; //this will be set higher for the bakeoff
+int trialCount = 4; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
 int trialIndex = 0; //what trial are we on
 int errorCount = 0;  //used to keep track of errors
@@ -41,7 +41,7 @@ float inchesToPixels(float inch)
 
 void setup() {
   size(600,600); 
-
+  //fullScreen();
   rectMode(CENTER);
   textFont(createFont("Arial", inchesToPixels(.2f))); //sets the font to Arial that is .3" tall
   textAlign(CENTER);
@@ -67,7 +67,7 @@ void setup() {
 
 
 void draw() {
-  Target t = targets.get(trialIndex);  
+  //Target t = targets.get(trialIndex);
 
 
   background(60); //background is dark grey
@@ -87,6 +87,7 @@ void draw() {
   //===========DRAW TARGET SQUARE=================
   pushMatrix();
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
+  Target t = targets.get(trialIndex);
   translate(t.x, t.y); //center the drawing coordinates to the center of the screen
   rotate(radians(t.rotation));
   fill(255, 0, 0); //set color to semi translucent
@@ -102,39 +103,24 @@ void draw() {
     
   }
   
-    
-  println(screenTransX);
-  println(screenTransY);
-  if(flag == false && mousePressed && dist(lastX, lastY, mouseX, mouseY)<inchesToPixels(1f)){
+  if(flag == false && mousePressed && dist(lastX, lastY, mouseX, mouseY)<inchesToPixels(0.5f)){
     flag = true;
     flag2= true;
   }
   
   if(flag){
-    if(mouseY >= height/2){screenTransY = -1 * (height/2 - mouseY);}
-    else{screenTransY = mouseY - height/2;}
-    
-    if(mouseX >= width/2){screenTransX = mouseX - width/2;}
-    else{screenTransX = -1 * (width/2 - mouseX);}
+    screenTransY = mouseY;
+    screenTransX = mouseX;
   }
   
   if (flag == true && mousePressed){
-    lastX = mouseX;
     lastY = mouseY;
-    
-    //if(mouseY >= height/2){lastY = -1 * (height/2 - mouseY);}
-    //else{lastY = mouseY - height/2;}
-    
-    //if(mouseX >= width/2){lastX = mouseX - width/2;}
-    //else{lastX = -1 * (width/2 - mouseX);}
-    
+    lastX = mouseX;
     screenTransY = lastY;
     screenTransX = lastX;
     flag = false;
   }
-  
-  
- 
+
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
   noFill();
@@ -143,11 +129,15 @@ void draw() {
   rect(0,0, screenZ, screenZ);
   popMatrix();
   
-  boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
+  line(t.x+300, t.y+300, lastX, lastY);
+  
+  boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
   boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
-  println(t.x,t.y,lastX,lastY);
-  println(screenTransX, screenTransY);
+  noFill();
+  ellipse(t.x+300, t.y+300, inchesToPixels(.05f),inchesToPixels(.05f));
+  
+
   
     //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
@@ -187,18 +177,22 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
+  
+  float rotX = 100;
+  float rotY = 100;
+  ellipse(rotX, rotY, 50, 50);
 
-  ellipse(56, 46, 55, 55);
-  if(mousePressed && dist(56, 46, mouseX, mouseY)<inchesToPixels(2f)){
-    line(56, 46, mouseX, mouseY);
-    screenZ = dist(56, 46, mouseX, mouseY);
+  if(mousePressed && dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
+    line(rotX, rotY, mouseX, mouseY);
+    screenZ = dist(rotX, rotY, mouseX, mouseY);
       
-    PVector v1 = new PVector(56, 46);
-    PVector v2 = new PVector(mouseX, mouseY); 
-    float a = PVector.angleBetween(v1, v2);
-    text(getAngle(56, 46, mouseX, mouseY), 300,300);
-    screenRotation = getAngle(56, 46, mouseX, mouseY);
+    //PVector v1 = new PVector(56, 46);
+    //PVector v2 = new PVector(mouseX, mouseY); 
+    //float a = PVector.angleBetween(v1, v2);
+    screenRotation = getAngle(rotX, rotY, mouseX, mouseY);
   }
+  fill(0,255,0);
+  ellipse(550, 550, 55, 55);
 
   
   
@@ -255,13 +249,13 @@ void mousePressed()
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches
-  if (dist(width/2, height/2, mouseX, mouseY)<inchesToPixels(3f))
+  if (dist(550,550, mouseX, mouseY)<inchesToPixels(1f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
 
     //and move on to next trial
-    //trialIndex++;
+    trialIndex++;
     
     if (trialIndex==trialCount && userDone==false)
     {
@@ -275,7 +269,7 @@ void mouseReleased()
 public boolean checkForSuccess()
 {
 	Target t = targets.get(trialIndex);	
-	boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f); //has to be within .1"
+	boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
 	boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"	
 	
@@ -297,10 +291,6 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
         return diff;
  }
  
-// void mouseWheel(MouseEvent event) {
-//  float e = event.getCount();
-//  println(e);
-//}
 
 float getAngle(float pX1,float pY1, float pX2,float pY2){
   return atan2(pY2 - pY1, pX2 - pX1)* 180/ PI;
