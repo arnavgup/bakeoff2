@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.lang.System;
 
 //these are variables you should probably leave alone
 int index = 0;
@@ -47,7 +48,7 @@ void setup() {
   rectMode(CENTER);
   textFont(createFont("Arial", inchesToPixels(.2f))); //sets the font to Arial that is .3" tall
   textAlign(CENTER);
-
+frameRate(100);
   //don't change this! 
   border = inchesToPixels(.2f); //padding of 0.2 inches
 
@@ -86,7 +87,6 @@ void draw() {
     return;
   }
 
-  //===========DRAW TARGET SQUARE=================
   pushMatrix();
   translate(width/2, height/2); //center the drawing coordinates to the center of the screen
   Target t = targets.get(trialIndex);
@@ -94,10 +94,13 @@ void draw() {
   rotate(radians(t.rotation));
   fill(204, 255, 255); //set color to semi translucent
   rect(0, 0, t.z, t.z);
+  ellipse(t.x + t.z - 300, t.y + t.z/2 - 300, 10, 10);
   popMatrix();
-boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
+  
+  boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
   boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"  
+  
   //===========DRAW CURSOR SQUARE=================
   pushMatrix();
   if(rot_phase == false && rot_finish == true)
@@ -185,54 +188,13 @@ void scaffoldControlLogic()
     if(dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
       //line(rotX, rotY, mouseX, mouseY);
       //drawArrow(rotX, rotY, mouseX, mouseY);
-      screenZ = dist(rotX, rotY, mouseX, mouseY);
+      screenZ = (dist(rotX, rotY, mouseX, mouseY)/1.41421356237)*2;
         
-      screenRotation = getAngle(rotX, rotY, mouseX, mouseY);
+      screenRotation = getAngle(rotX, rotY, mouseX, mouseY)-45;
     }
   }
   
 
-
-  
-  
-  
-  
-  ////upper left corner, rotate counterclockwise
-  //text("CCW", inchesToPixels(.2f), inchesToPixels(.2f));
-  //if (mousePressed && dist(0, 0, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenRotation--;
-
-  ////upper right corner, rotate clockwise
-  //text("CW", width-inchesToPixels(.2f), inchesToPixels(.2f));
-  //if (mousePressed && dist(width, 0, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenRotation++;
-
-  ////lower left corner, decrease Z
-  //text("-", inchesToPixels(.2f), height-inchesToPixels(.2f));
-  //if (mousePressed && dist(0, height, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenZ-=inchesToPixels(.02f);
-
-  ////lower right corner, increase Z
-  //text("+", width-inchesToPixels(.2f), height-inchesToPixels(.2f));
-  //if (mousePressed && dist(width, height, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenZ+=inchesToPixels(.02f);
-
-  ////left middle, move left
-  //text("left", inchesToPixels(.2f), height/2);
-  //if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenTransX-=inchesToPixels(.02f);
-
-  //text("right", width-inchesToPixels(.2f), height/2);
-  //if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenTransX+=inchesToPixels(.02f);
-  
-  //text("up", width/2, inchesToPixels(.2f));
-  //if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchesToPixels(.5f))
-  //  screenTransY-=inchesToPixels(.02f);
-  
-  //text("down", width/2, height-inchesToPixels(.2f));
-  //if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchesToPixels(.5f))
-  //  +=inchesToPixels(.02f);
 }
 
 

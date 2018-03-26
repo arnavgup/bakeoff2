@@ -141,7 +141,7 @@ boolean closeDist = dist(t.x,t.y,screenTransX,screenTransY)<inchesToPixels(.05f)
     float rotY = 300;
   
     if(dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
-      t.z = dist(rotX, rotY, mouseX, mouseY);
+      t.z = dist(rotX, rotY, mouseX, mouseY)*2;
       t.rotation = getAngle(rotX, rotY, mouseX, mouseY);
     }
   }
