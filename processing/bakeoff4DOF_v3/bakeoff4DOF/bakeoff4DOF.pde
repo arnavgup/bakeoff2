@@ -110,11 +110,11 @@ void draw() {
   screenTransY = mouseY;
   screenTransX = mouseX;
   
-  if (dist(mouseX, mouseY, t.x, t.y) > dist(mouseX, mouseY, lx, ly)){
-  t.z += 1;
+  if (dist(lx, ly, t.x + 300,t.y+300) > dist(t.x+300, t.y+300, mouseX, mouseY)){
+  t.z += 1; 
   }
-  lx = t.x;
-  ly = t.y;
+  lx = mouseX;
+  ly = mouseY;
   fill(255,255,255);
   
   drawArrow(mouseX, mouseY, t.x+300, t.y+300);
