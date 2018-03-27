@@ -15,6 +15,8 @@ boolean userDone = false;
 boolean rot_phase = false;
 boolean start_game = false;
 boolean rot_finish = true;
+float lx = 0;
+float ly = 0;
 boolean flag4 = false;
 int lastX = 300;
 int lastY = 300;
@@ -73,7 +75,7 @@ void draw() {
   //Target t = targets.get(trialIndex);
 
 
-  background(60); //background is dark grey
+  background(90); //background is dark grey
   fill(200);
   noStroke();
 
@@ -94,7 +96,7 @@ void draw() {
   rotate(radians(t.rotation));
   fill(204, 255, 255); //set color to semi translucent
   rect(0, 0, t.z, t.z);
-  ellipse(t.x + t.z - 300, t.y + t.z/2 - 300, 10, 10);
+  //ellipse(t.x + t.z - 300, t.y + t.z/2 - 300, 10, 10);
   popMatrix();
   
   boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
@@ -107,7 +109,13 @@ void draw() {
   {
   screenTransY = mouseY;
   screenTransX = mouseX;
- fill(255,255,255);
+  
+  if (dist(mouseX, mouseY, t.x, t.y) > dist(mouseX, mouseY, lx, ly)){
+  t.z += 1;
+  }
+  lx = t.x;
+  ly = t.y;
+  fill(255,255,255);
   
   drawArrow(mouseX, mouseY, t.x+300, t.y+300);
   }
@@ -117,8 +125,10 @@ void draw() {
   rotate(radians(screenRotation));
   fill(255,255,255,50);
   int op = 0;
+  int f = 255;
   if(closeDist == true){
-    op += 50;
+    op += 70;
+    f = 255;
   }
   if(closeRotation == true){
     op += 20;
@@ -126,7 +136,7 @@ void draw() {
   if(closeZ == true){
     op += 25;
   }
-  fill(0,255,0,op);
+  fill(0,255,f,op);
   if(checkForSuccess()==true){
     fill(0, 255, 0);
   }
@@ -161,6 +171,7 @@ void draw() {
    if(closeDist){
     fill(0, 255, 0);
     
+    
    }
    else{
      fill(220,20,60);
@@ -185,7 +196,7 @@ void scaffoldControlLogic()
     float rotX = screenTransX;
     float rotY = screenTransY;
   
-    if(dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(3f)){
+    if(dist(rotX, rotY, mouseX, mouseY)<inchesToPixels(6f)){
       //line(rotX, rotY, mouseX, mouseY);
       //drawArrow(rotX, rotY, mouseX, mouseY);
       screenZ = (dist(rotX, rotY, mouseX, mouseY)/1.41421356237)*2;
