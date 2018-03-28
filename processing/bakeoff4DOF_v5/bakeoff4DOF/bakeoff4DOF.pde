@@ -4,7 +4,7 @@ import java.lang.System;
 
 //these are variables you should probably leave alone
 int index = 0;
-int trialCount = 8; //this will be set higher for the bakeoff
+int trialCount = 20; //this will be set higher for the bakeoff
 float border = 0; //have some padding from the sides
 int trialIndex = 0; //what trial are we on
 int errorCount = 0;  //used to keep track of errors
@@ -21,7 +21,7 @@ float ly = 0;
 boolean flag4 = false;
 int lastX = 300;
 int lastY = 300;
-final int screenPPI = 72; //what is the DPI of the screen you are using
+final int screenPPI = 100; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
 //These variables are for my example design. Your input code should modify/replace these!
@@ -95,8 +95,11 @@ void draw() {
   Target t = targets.get(trialIndex);
   translate(t.x, t.y); //center the drawing coordinates to the center of the screen
   rotate(radians(t.rotation));
-  
-  fill(204, 255, 255); //set color to semi translucent
+  if(dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f)){
+    fill(0, 255, 0);
+   }
+   else{
+  fill(204, 255, 255); }//set color to semi translucent
   rect(0, 0, t.z, t.z);
   //ellipse(t.x + t.z - 300, t.y + t.z/2 - 300, 10, 10);
   popMatrix();
@@ -126,7 +129,7 @@ void draw() {
   translate(screenTransX, screenTransY);
   rotate(radians(screenRotation));
   noFill();
-  if(closeDist){
+  if(closeDist && rot_phase){
   fill(255,255,255,50);
   int op = 0;
   int f = 255;
@@ -142,7 +145,7 @@ void draw() {
   }
   fill(0,255,f,op);
   if(checkForSuccess()==true){
-    fill(0, 255, 0);
+    fill(244, 0,0);
   }
   stroke(160);
   rect(0,0, screenZ, screenZ);}
@@ -161,34 +164,7 @@ void draw() {
   fill(255);
   scaffoldControlLogic(t); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchesToPixels(.3f));
-  textSize(25);
-  if(closeRotation){
-    fill(0, 255, 0);
-   }
-   else{
-     fill(220,20,60);
-   }
-  text("Rotation", width/4, 50);
-   
-   
-   if(closeDist){
-    fill(0, 255, 0);
-    
-    
-   }
-   else{
-     fill(220,20,60);
-   }
-  text("Distance", 2*width/4, 50);
-  
-  
-  if(closeZ){
-    fill(0, 255, 0);
-   }
-   else{
-     fill(220,20,60);
-   }
-  text("Size", 3*width/4, 50);
+  textSize(40);
   textSize(15);
 }
 
@@ -264,10 +240,6 @@ public boolean checkForSuccess()
 	boolean closeDist = dist(t.x,t.y,screenTransX-width/2,screenTransY-height/2)<inchesToPixels(.05f); //has to be within .1"
   boolean closeRotation = calculateDifferenceBetweenAngles(t.rotation,screenRotation)<=5;
 	boolean closeZ = abs(t.z - screenZ)<inchesToPixels(.05f); //has to be within .1"	
-	
-  //println("Close Enough Distance: " + closeDist + " (cursor X/Y = " + t.x + "/" + t.y + ", target X/Y = " + screenTransX + "/" + screenTransY +")");
-  //println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(t.rotation,screenRotation)+")");
- 	//println("Close Enough Z: " +  closeZ + " (cursor Z = " + t.z + ", target Z = " + screenZ +")");
 	
 	return closeDist && closeRotation && closeZ;	
 }
